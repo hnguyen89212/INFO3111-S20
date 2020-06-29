@@ -124,11 +124,11 @@ int main(void)
         m = glm::mat4(1.0f);
 
         //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-        glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f),
-                                        (float)glfwGetTime(),
-                                        glm::vec3(0.0f, 0.0, 1.0f));
-
-        m = m * rotateZ;
+//        glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f),
+//                                        (float)glfwGetTime(),
+//                                        glm::vec3(0.0f, 0.0, 1.0f));
+//
+//       m = m * rotateZ;
 
         //mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
         p = glm::perspective(0.6f,
