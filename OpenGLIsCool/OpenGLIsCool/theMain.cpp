@@ -12,26 +12,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static const struct
+#include <iostream>
+
+struct sVertex
 {
-    float x, y;
+    float x, y, z;      // NEW! With Zs
     float r, g, b;
-} vertices[3] =
-{
-    { -0.6f, -0.4f, 1.f, 0.f, 0.f },
-    {  0.6f, -0.4f, 0.f, 1.f, 0.f },
-    {   0.f,  0.6f, 0.f, 0.f, 1.f }
 };
+
+sVertex vertices[6] =
+{
+    { -0.6f, -0.4f, 0.0f /*z*/, 1.0f, 0.0f, 0.0f },         // 0
+    {  0.6f, -0.4f, 0.0f /*z*/, 0.0f, 1.0f, 0.0f },         // 1 
+    {  0.0f,  0.6f, 0.0f /*z*/, 0.0f, 0.0f, 1.0f },         // 2
+    { -0.6f,  0.4f, 0.0f /*z*/, 1.0f, 0.0f, 0.0f },         // 3
+    {  0.6f,  0.4f, 0.0f /*z*/, 0.0f, 1.0f, 0.0f },
+    {  0.0f,  1.6f, 0.0f /*z*/, 0.0f, 0.0f, 1.0f }          // 5
+};
+
 
 static const char* vertex_shader_text =
 "#version 110\n"
 "uniform mat4 MVP;\n"
-"attribute vec3 vCol;\n"
-"attribute vec2 vPos;\n"
+"attribute vec3 vCol;\n"        
+"attribute vec3 vPos;\n"        
 "varying vec3 color;\n"
 "void main()\n"
 "{\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
+"    gl_Position = MVP * vec4(vPos, 1.0);\n"
 "    color = vCol;\n"
 "}\n";
 
@@ -56,23 +64,32 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 
 int main(void)
 {
+    std::cout << "About to start..." << std::endl;
+
     GLFWwindow* window;
-    GLuint vertex_buffer, vertex_shader, fragment_shader, program;
+    GLuint vertex_buffer;
+    GLuint vertex_shader; 
+    GLuint fragment_shader;
+    GLuint program;
+
     GLint mvp_location, vpos_location, vcol_location;
 
     glfwSetErrorCallback(error_callback);
     if (!glfwInit())
     {
+        std::cout << "Can't init GLFW. Exiting" << std::endl;
         exit(EXIT_FAILURE);
     }
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
+    std::cout << "About to create window..." << std::endl;
     window = glfwCreateWindow(1024, 700, "Long Live COBOL", NULL, NULL);
     if (!window)
     {
         // Can't init openGL. Oh no. 
+        std::cout << "ERROR: Can't create window." << std::endl;
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -94,8 +111,8 @@ int main(void)
     fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
     glCompileShader(fragment_shader);
-    program = glCreateProgram();
 
+    program = glCreateProgram();
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
@@ -110,6 +127,9 @@ int main(void)
     glEnableVertexAttribArray(vcol_location);
     glVertexAttribPointer(vcol_location, 3, GL_FLOAT, GL_FALSE,
                           sizeof(vertices[0]), (void*)(sizeof(float) * 2));
+
+    std::cout << "We're all set! Buckle up!" << std::endl;
+
     while (!glfwWindowShouldClose(window))
     {
         float ratio;
