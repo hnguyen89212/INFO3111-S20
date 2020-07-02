@@ -72,6 +72,7 @@ int main(void)
     window = glfwCreateWindow(1024, 700, "Long Live COBOL", NULL, NULL);
     if (!window)
     {
+        // Can't init openGL
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
