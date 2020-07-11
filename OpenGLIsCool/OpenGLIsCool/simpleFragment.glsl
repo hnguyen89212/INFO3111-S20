@@ -1,6 +1,7 @@
-#version 110
+#version 420
 
-varying vec3 color;
+// "varying" -> "in". Note the variable names match in both .glsl files.
+in vec3 color;
 
 void main()
 {

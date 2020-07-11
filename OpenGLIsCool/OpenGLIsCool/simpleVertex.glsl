@@ -1,11 +1,13 @@
-#version 110
+#version 420
 
 uniform mat4 MVP;
 
-attribute vec3 vCol;     
-attribute vec3 vPos;        
+// vertices coming into the shader. Hence, instead of "attribute", we use "in" to indicate the direction.
+in vec3 vCol;     
+in vec3 vPos;        
 
-varying vec3 color;
+// color is passed to next stage (fragment shader) in pipeline, so we use "out" instead of "varying".
+out vec3 color;
 
 void main()
 {
