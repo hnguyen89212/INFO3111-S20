@@ -36,6 +36,9 @@
     <ClCompile Include="cVAOManager.cpp">
       <Filter>VAOandModel</Filter>
     </ClCompile>
+    <ClCompile Include="cMeshObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cShaderManager.h">
@@ -46,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="cVAOManager.h">
       <Filter>VAOandModel</Filter>
+    </ClInclude>
+    <ClInclude Include="cMeshObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

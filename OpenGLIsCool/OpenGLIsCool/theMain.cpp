@@ -1,4 +1,4 @@
-/** 
+/**
 Student: Hai Nguyen
 ID: 0904995
 INFO-3111-(01-02)-20S
@@ -19,9 +19,15 @@ Checkpoint #03
 #include <iostream>
 #include <fstream>>
 #include <string>
+#include <vector>
 
 #include "cShaderManager.h"
 #include "cVAOManager.h"
+#include "cMeshObject.h"
+
+// ----------------------------------------------
+// To draw multiple models, removed later
+std::vector<cMeshObject*> g_pVecMeshObjects;
 
 // ----------------------------------------------
 // Camera
@@ -30,7 +36,7 @@ Checkpoint #03
 //glm::vec3 g_cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 //glm::vec3 g_upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
-glm::vec3 g_cameraEye = glm::vec3(400.0f, 360.0f, -300.0f);
+glm::vec3 g_cameraEye = glm::vec3(0.0f, 0.0f, 400.0f);
 glm::vec3 g_cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 g_upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -58,12 +64,18 @@ static void error_callback(int error, const char* description)
 * D = left
 * S = forward
 * W = backward
-* Q = up
-* E = down
+* E = up
+* Q = down
 */
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-	const float CAMERA_SPEED = 1.f;
+	const float CAMERA_SPEED = 1.0f;
+
+	/*if (key == GLFW_KEY_L)
+		::g_pVecMeshObjects[0]->orientation.z = glm::radians((float)1.f);
+
+	if (key == GLFW_KEY_K)
+		::g_pVecMeshObjects[0]->orientation.z -= glm::radians((float)1.f);*/
 
 	if (key == GLFW_KEY_A)
 		::g_cameraEye.x -= CAMERA_SPEED;
@@ -77,10 +89,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_W)
 		::g_cameraEye.z += CAMERA_SPEED;
 
-	if (key == GLFW_KEY_E)
+	if (key == GLFW_KEY_Q)
 		::g_cameraEye.y -= CAMERA_SPEED;
 
-	if (key == GLFW_KEY_Q)
+	if (key == GLFW_KEY_E)
 		::g_cameraEye.y += CAMERA_SPEED;
 
 	// Closes the window
@@ -158,15 +170,49 @@ int main(void)
 
 	::g_pVAOManager = new cVAOManager();
 
-	sModelDrawInfo bunnyModel;
-	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/dolphin_color.ply", bunnyModel, program))
-		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
+	/**
+	For the .ply files, convert them into the correct format via exporting mesh in MeshLab.
+	We can actually load multiple models into memory. See the cVAOManager for more info.
+	Inside cVAOManager, there is a "dictionary", we could pass on the exact name of a model to draw, no need to reload it into memory.
+	*/
 
-	while (!glfwWindowShouldClose(window))
+	sModelDrawInfo mdiDolphin;
+	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/dolphin_color.ply", mdiDolphin, program))
 	{
+		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
+	}
+
+	sModelDrawInfo mdiBunny;
+	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/bun_zipper_res4.ply", mdiBunny, program))
+	{
+		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
+	}
+
+	/**
+	Add to the list of cMeshObjects to draw.
+	*/
+
+	cMeshObject* pDolphin = new cMeshObject();
+	pDolphin->meshName = "assets/models/dolphin_color.ply";
+	pDolphin->position.x = -20.0f;
+	pDolphin->scale = 0.5f; // half of its original size
+	::g_pVecMeshObjects.push_back(pDolphin);
+
+	cMeshObject* pDolphin2 = new cMeshObject();
+	pDolphin2->meshName = "assets/models/dolphin_color.ply";
+	pDolphin2->position.x = 20.0f;
+	pDolphin2->scale = 0.5f; // half of its original size
+	pDolphin2->orientation.z = glm::radians(135.0f); // rotate around the z-axis 135 degree
+	::g_pVecMeshObjects.push_back(pDolphin2);
+
+	while (!glfwWindowShouldClose(window)) {
 		float ratio;
 		int width, height;
-		glm::mat4 m, p, v, mvp;
+		// mathModel = model matrix
+		// p = projection matrix
+		// v = view matrix
+		// mvp = model view projection
+		glm::mat4 matModel, p, v, mvp;
 
 		glfwGetFramebufferSize(window, &width, &height);
 		ratio = width / (float)height;
@@ -175,12 +221,13 @@ int main(void)
 		glEnable(GL_DEPTH_TEST);
 		glCullFace(GL_BACK);
 
-		m = glm::mat4(1.0f);
+		/*matModel = glm::mat4(1.0f);*/
 
+		// view frustum
 		p = glm::perspective(0.6f,
 			ratio,
-			0.1f,
-			1000.0f);
+			0.1f,			// near plane, anything nearer than this won't be drawn.
+			100000.0f); // far plane, anything further than this won't be drawn.
 
 		v = glm::mat4(1.0f);
 
@@ -188,31 +235,99 @@ int main(void)
 			::g_cameraTarget,
 			::g_upVector);
 
-		mvp = p * v * m;
-
-
-		glUseProgram(program);
-
-		if (::g_isWireFrame)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		else
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
-
-		sModelDrawInfo mdoModelToDraw;
-		if (::g_pVAOManager->FindDrawInfoByModelName("assets/models/dolphin_color.ply",
-			mdoModelToDraw))
+		/**
+		Draw all the mesh objects in vector right here.
+		*/
+		for (
+			std::vector<cMeshObject*>::iterator it_pMesh = ::g_pVecMeshObjects.begin();
+			it_pMesh != ::g_pVecMeshObjects.end();
+			it_pMesh++
+			)
 		{
-			glBindVertexArray(mdoModelToDraw.VAO_ID);
+			cMeshObject* pCurrentMesh = *it_pMesh;
 
-			glDrawElements(GL_TRIANGLES,
-				mdoModelToDraw.numberOfIndices,
-				GL_UNSIGNED_INT,     // How big the index values are 
-				0);        // Starting index for this model
+			// model matrix represents where object is placed in space.
+			matModel = glm::mat4(1.0f);
 
-			glBindVertexArray(0);
-		}
+			/**
+			Model transformations
+			*/
+			// Place the object in the world at 'this' location
+			glm::mat4 matTranslation
+				= glm::translate(
+					glm::mat4(1.0f),
+					glm::vec3(pCurrentMesh->position.x, pCurrentMesh->position.y, pCurrentMesh->position.z)
+				);
+			matModel = matModel * matTranslation;
+
+
+			//mat4x4_rotate_Z(m, m, );
+			//*************************************
+			// ROTATE around Z
+			glm::mat4 matRotateZ = glm::rotate(glm::mat4(1.0f),
+				pCurrentMesh->orientation.z, // (float) glfwGetTime(), 
+				glm::vec3(0.0f, 0.0f, 1.0f));
+			matModel = matModel * matRotateZ;
+			//*************************************
+
+			//*************************************
+			// ROTATE around Y
+			glm::mat4 matRotateY = glm::rotate(glm::mat4(1.0f),
+				pCurrentMesh->orientation.y, // (float) glfwGetTime(), 
+				glm::vec3(0.0f, 1.0f, 0.0f));
+			matModel = matModel * matRotateY;
+			//*************************************
+
+			//*************************************
+			// ROTATE around X
+			glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f),
+				pCurrentMesh->orientation.x, // (float) glfwGetTime(), 
+				glm::vec3(1.0f, 0.0, 0.0f));
+			matModel = matModel * rotateX;
+			//*************************************
+
+
+			// Set up a scaling matrix
+			glm::mat4 matScale = glm::mat4(1.0f);
+
+			float theScale = pCurrentMesh->scale;		// 1.0f;		
+			matScale = glm::scale(glm::mat4(1.0f),
+				glm::vec3(theScale, theScale, theScale));
+
+
+			// Apply (multiply) the scaling matrix to 
+			// the existing "model" (or "world") matrix
+			matModel = matModel * matScale;
+
+			mvp = p * v * matModel;
+
+			glUseProgram(program);
+
+			if (pCurrentMesh->isWireFrame) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // wireframe
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // solid
+			}
+
+			glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
+
+			/**
+			Look inside the "dictionary" for the model to draw.
+			*/
+
+			sModelDrawInfo mdoModelToDraw;
+			if (::g_pVAOManager->FindDrawInfoByModelName(pCurrentMesh->meshName, mdoModelToDraw)) {
+				glBindVertexArray(mdoModelToDraw.VAO_ID);
+
+				glDrawElements(GL_TRIANGLES,
+					mdoModelToDraw.numberOfIndices,
+					GL_UNSIGNED_INT,     // How big the index values are 
+					0);        // Starting index for this model
+
+				glBindVertexArray(0);
+			}
+		} // end for loop
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
