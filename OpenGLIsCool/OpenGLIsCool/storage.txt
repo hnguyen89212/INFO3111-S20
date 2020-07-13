@@ -1,0 +1,14 @@
+2
+assets/models/dolphin_color.ply
+0,0,0,
+0,0,0,0,
+0,0,0,
+2.8
+0
+assets/models/bun_zipper_res4.ply
+0,200,0,
+0,0,0,0,
+0,0,0,
+4000
+0
+#
