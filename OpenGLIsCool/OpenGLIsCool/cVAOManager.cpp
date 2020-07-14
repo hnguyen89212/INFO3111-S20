@@ -214,7 +214,10 @@ bool cVAOManager::m_LoadTheModel(std::string fileName,
 	struct sVertPly
 	{
 		glm::vec3 pos;
+		glm::vec3 normal;
 		glm::vec4 colour;
+		float texture_u;
+		float texture_v;
 	};
 
 	std::vector<sVertPly> vecTempPlyVerts;
@@ -239,8 +242,12 @@ bool cVAOManager::m_LoadTheModel(std::string fileName,
 		Shift first, then scale => 
 		*/
 
+		thePlyFile >> tempVert.normal.x >> tempVert.normal.y >> tempVert.normal.z;
+
 		thePlyFile >> tempVert.colour.x >> tempVert.colour.y
 			>> tempVert.colour.z >> tempVert.colour.w;
+
+		thePlyFile >> tempVert.texture_u >> tempVert.texture_v;
 
 		// Scale the colour from 0 to 1, instead of 0 to 255
 		tempVert.colour.x /= 255.0f;

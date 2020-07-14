@@ -317,19 +317,20 @@ int main(void)
 	Inside cVAOManager, there is a "dictionary", we could pass on the exact name of a model to draw, no need to reload it into memory.
 	*/
 
+	sModelDrawInfo mdiBunny;
+	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/bun_zipper_res2_xyz_n_rgba_uv.ply", mdiBunny, program))
+	{
+		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
+	}
+
+	/*
 	sModelDrawInfo mdiDolphin;
 	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/dolphin_color.ply", mdiDolphin, program))
 	{
 		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
 	}
 
-	sModelDrawInfo mdiBunny;
-	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/bun_zipper_res4.ply", mdiBunny, program))
-	{
-		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
-	}
-
-	/*sModelDrawInfo mdiGourard;
+	sModelDrawInfo mdiGourard;
 	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/gourard_xyz_rgba.ply", mdiGourard, program))
 	{
 		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
@@ -357,55 +358,58 @@ int main(void)
 	if (!::g_pVAOManager->LoadModelIntoVAO("assets/models/PacificCod0_xyz_rgba.ply", mdiPacificCod0, program))
 	{
 		std::cout << "Error: " << ::g_pVAOManager->getLastError() << std::endl;
-	}*/
+	}
+	*/
 
 	/**
 	Add to the list of cMeshObjects to draw.
 	*/
 
+	cMeshObject* pBunny = new cMeshObject();
+	pBunny->meshName = "assets/models/bun_zipper_res2_xyz_n_rgba_uv.ply";
+	pBunny->scale = 1000.f;
+	//pBunny->position.y += 200.0f;
+	::g_pVecMeshObjects.push_back(pBunny);
+
+	/*
 	cMeshObject* pDolphin = new cMeshObject();
 	pDolphin->meshName = "assets/models/dolphin_color.ply";
 	pDolphin->scale = 0.7f; // half of its original size
 	::g_pVecMeshObjects.push_back(pDolphin);
 
-	cMeshObject* pBunny = new cMeshObject();
-	pBunny->meshName = "assets/models/bun_zipper_res4.ply";
-	pBunny->scale = 1000.f;
-	pBunny->position.y += 200.0f;
-	::g_pVecMeshObjects.push_back(pBunny);
+	cMeshObject* pGourard = new cMeshObject();
+	pGourard->meshName = "assets/models/gourard_xyz_rgba.ply";
+	pGourard->position.x -= 700.0f;
+	pGourard->position.y -= 1000.0f;
+	pGourard->scale = 0.10f; // half of its original size
+	//pGourard->orientation.z = glm::radians(135.0f); // rotate around the z-axis 135 degree
+	::g_pVecMeshObjects.push_back(pGourard);
 
-	//cMeshObject* pGourard = new cMeshObject();
-	//pGourard->meshName = "assets/models/gourard_xyz_rgba.ply";
-	//pGourard->position.x -= 700.0f;
-	//pGourard->position.y -= 1000.0f;
-	//pGourard->scale = 0.10f; // half of its original size
-	////pGourard->orientation.z = glm::radians(135.0f); // rotate around the z-axis 135 degree
-	//::g_pVecMeshObjects.push_back(pGourard);
+	cMeshObject* pCorellianCorvette = new cMeshObject();
+	pCorellianCorvette->meshName = "assets/models/Corellian_Corvette_(Blockade_Runner)_xyz_rgba.ply";
+	pCorellianCorvette->scale = 10.f;
+	pCorellianCorvette->position.y -= 250.0f;
+	::g_pVecMeshObjects.push_back(pCorellianCorvette);
 
-	//cMeshObject* pCorellianCorvette = new cMeshObject();
-	//pCorellianCorvette->meshName = "assets/models/Corellian_Corvette_(Blockade_Runner)_xyz_rgba.ply";
-	//pCorellianCorvette->scale = 10.f;
-	//pCorellianCorvette->position.y -= 250.0f;
-	//::g_pVecMeshObjects.push_back(pCorellianCorvette);
+	cMeshObject* pSeaFloor = new cMeshObject();
+	pSeaFloor->meshName = "assets/models/Seafloor2_xyz_rgba.ply";
+	pSeaFloor->scale = 5.f;
+	pSeaFloor->position.y -= 500.0f;
+	::g_pVecMeshObjects.push_back(pSeaFloor);
 
-	//cMeshObject* pSeaFloor = new cMeshObject();
-	//pSeaFloor->meshName = "assets/models/Seafloor2_xyz_rgba.ply";
-	//pSeaFloor->scale = 5.f;
-	//pSeaFloor->position.y -= 500.0f;
-	//::g_pVecMeshObjects.push_back(pSeaFloor);
+	cMeshObject* pSu74 = new cMeshObject();
+	pSu74->meshName = "assets/models/su47_xyz_rgba.ply";
+	pSu74->scale = 1500.f;
+	pSu74->position.y += 500.0f;
+	::g_pVecMeshObjects.push_back(pSu74);
 
-	//cMeshObject* pSu74 = new cMeshObject();
-	//pSu74->meshName = "assets/models/su47_xyz_rgba.ply";
-	//pSu74->scale = 1500.f;
-	//pSu74->position.y += 500.0f;
-	//::g_pVecMeshObjects.push_back(pSu74);
-
-	//cMeshObject* pPacificCod0 = new cMeshObject();
-	//pPacificCod0->meshName = "assets/models/PacificCod0_xyz_rgba.ply";
-	//pPacificCod0->scale = 1700.f;
-	//pPacificCod0->position.y += 500.0f;
-	//pPacificCod0->position.x -= 700.0f;
-	//::g_pVecMeshObjects.push_back(pPacificCod0);
+	cMeshObject* pPacificCod0 = new cMeshObject();
+	pPacificCod0->meshName = "assets/models/PacificCod0_xyz_rgba.ply";
+	pPacificCod0->scale = 1700.f;
+	pPacificCod0->position.y += 500.0f;
+	pPacificCod0->position.x -= 700.0f;
+	::g_pVecMeshObjects.push_back(pPacificCod0);
+	*/
 
 	while (!glfwWindowShouldClose(window)) {
 		float ratio;
